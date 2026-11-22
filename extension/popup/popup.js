@@ -18,10 +18,12 @@
     msgEl.textContent = text || "";
   }
 
+  const DEFAULT_SERVER_URL = "wss://syncwatch-firefox-android.onrender.com";
+
   function getConfig() {
     return {
       displayName: (nameInput.value || "Guest").trim(),
-      serverUrl: (serverInput.value || "ws://localhost:8765").trim(),
+      serverUrl: (serverInput.value || DEFAULT_SERVER_URL).trim(),
       turnUrl: (turnUrlInput.value || "").trim(),
       turnUser: (turnUserInput.value || "").trim(),
       turnPass: (turnPassInput.value || "").trim(),
@@ -43,7 +45,7 @@
       "turnPass",
     ]);
     nameInput.value = stored.displayName || "";
-    serverInput.value = stored.serverUrl || "ws://localhost:8765";
+    serverInput.value = stored.serverUrl || DEFAULT_SERVER_URL;
     turnUrlInput.value = stored.turnUrl || "";
     turnUserInput.value = stored.turnUser || "";
     turnPassInput.value = stored.turnPass || "";

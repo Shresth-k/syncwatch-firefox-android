@@ -36,9 +36,11 @@
   const SVG_SPEAKER_OFF = `<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><line x1="22" y1="9" x2="16" y2="15"/><line x1="16" y1="9" x2="22" y2="15"/></svg>`;
   const SVG_EYE_OFF = `<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94"/><path d="M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19"/><line x1="1" y1="1" x2="23" y2="23"/></svg>`;
 
+  const DEFAULT_SERVER_URL = "wss://syncwatch-firefox-android.onrender.com";
+
   // Runtime state
   let settings = {
-    serverUrl: "ws://localhost:8765",
+    serverUrl: DEFAULT_SERVER_URL,
     displayName: "Guest",
     turnUrl: "",
     turnUser: "",
@@ -113,7 +115,7 @@
   function buildInviteLink() {
     if (!roomCode) return "";
     try {
-      const u = new URL(settings.serverUrl || "ws://localhost:8765");
+      const u = new URL(settings.serverUrl || DEFAULT_SERVER_URL);
       u.protocol = u.protocol === "wss:" ? "https:" : "http:";
       return `${u.protocol}//${u.host}/join/${encodeURIComponent(roomCode)}`;
     } catch {

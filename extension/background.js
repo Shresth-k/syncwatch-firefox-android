@@ -426,7 +426,7 @@ api.runtime.onMessage.addListener((msg, sender) => {
       }
 
       const config = { ...(msg.config || {}) };
-      const parsed = parseRoomInput(msg.roomCode, config.serverUrl || "ws://localhost:8765");
+      const parsed = parseRoomInput(msg.roomCode, config.serverUrl || "wss://syncwatch-firefox-android.onrender.com");
       if (!parsed.roomCode) {
         return { ok: false, error: "Enter a room code or invite link." };
       }

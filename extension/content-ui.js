@@ -1357,7 +1357,7 @@
           .catch(() => ({}));
         const cfg = {
           displayName: stored.displayName || "Guest",
-          serverUrl: serverUrl || stored.serverUrl || "ws://localhost:8765",
+          serverUrl: serverUrl || stored.serverUrl || "wss://syncwatch-firefox-android.onrender.com",
           turnUrl: stored.turnUrl || "",
           turnUser: stored.turnUser || "",
           turnPass: stored.turnPass || "",
