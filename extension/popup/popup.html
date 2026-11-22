@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>SyncWatch</title>
+  <link rel="stylesheet" href="popup.css" />
+</head>
+<body>
+  <div class="wrap">
+    <header class="hdr">
+      <div class="title">SyncWatch</div>
+      <span id="page-status" class="pill">Checking tab…</span>
+    </header>
+
+    <label class="field">
+      <span>Display Name</span>
+      <input id="name" type="text" placeholder="Your name" maxlength="20" />
+    </label>
+
+    <div class="actions">
+      <button id="btn-create" class="btn primary">Create Room & Open</button>
+      <div class="join-row">
+        <input id="code" type="text" placeholder="CODE or invite link" maxlength="200" />
+        <button id="btn-join" class="btn secondary">Join</button>
+      </div>
+      <button id="btn-overlay" class="btn ghost">Open Overlay Only</button>
+    </div>
+
+    <details class="settings">
+      <summary>Server & TURN Settings</summary>
+      <label class="field">
+        <span>Signaling Server (ws:// or wss://)</span>
+        <input id="server-url" type="text" placeholder="ws://localhost:8765" />
+      </label>
+      <label class="field">
+        <span>Optional TURN URL (for strict 4G/5G NAT)</span>
+        <input id="turn-url" type="text" placeholder="turn:global.relay.metered.ca:80" />
+      </label>
+      <div class="join-row">
+        <input id="turn-user" type="text" placeholder="TURN username" />
+        <input id="turn-pass" type="password" placeholder="TURN password" />
+      </div>
+      <button id="btn-save" class="btn secondary small">Save Settings</button>
+    </details>
+
+    <div id="msg" class="msg"></div>
+  </div>
+  <script src="popup.js"></script>
+</body>
+</html>

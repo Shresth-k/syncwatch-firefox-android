@@ -1,0 +1,64 @@
+{
+  "manifest_version": 3,
+  "name": "SyncWatch — Watch Together",
+  "version": "0.1.0",
+  "description": "Watch YouTube, anime, and streaming sites in sync with cam, mic, separate audio controls, and subtitle-safe fullscreen layouts.",
+  "icons": {
+    "48": "icons/icon.svg",
+    "96": "icons/icon.svg"
+  },
+  "action": {
+    "default_title": "SyncWatch",
+    "default_popup": "popup/popup.html",
+    "default_icon": {
+      "48": "icons/icon.svg"
+    }
+  },
+  "permissions": [
+    "storage",
+    "tabs"
+  ],
+  "host_permissions": [
+    "<all_urls>"
+  ],
+  "content_security_policy": {
+    "extension_pages": "script-src 'self';"
+  },
+  "background": {
+    "scripts": ["background.js"]
+  },
+  "content_scripts": [
+    {
+      "matches": ["<all_urls>"],
+      "js": ["content-video.js"],
+      "all_frames": true,
+      "run_at": "document_idle"
+    },
+    {
+      "matches": ["<all_urls>"],
+      "js": ["content-ui.js"],
+      "all_frames": false,
+      "run_at": "document_idle"
+    }
+  ],
+  "web_accessible_resources": [
+    {
+      "resources": [
+        "call/call.html",
+        "call/call.css",
+        "call/call.js",
+        "icons/icon.svg"
+      ],
+      "matches": ["<all_urls>"]
+    }
+  ],
+  "browser_specific_settings": {
+    "gecko": {
+      "id": "syncwatch@mayank.local",
+      "strict_min_version": "120.0"
+    },
+    "gecko_android": {
+      "strict_min_version": "120.0"
+    }
+  }
+}

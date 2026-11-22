@@ -1,0 +1,18 @@
+services:
+  - type: web
+    name: syncwatch-signaling
+    runtime: node
+    plan: free
+    rootDir: server
+    buildCommand: npm install
+    startCommand: npm start
+    envVars:
+      - key: NODE_ENV
+        value: production
+      # Optional: Set these in Render Dashboard for automatic 4G/5G TURN relay for all room users!
+      # - key: TURN_URL
+      #   value: turn:global.relay.metered.ca:80
+      # - key: TURN_USER
+      #   sync: false
+      # - key: TURN_PASS
+      #   sync: false

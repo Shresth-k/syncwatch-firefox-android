@@ -1,0 +1,602 @@
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+}
+
+html, body {
+  width: 100%;
+  height: 100%;
+  background: transparent;
+  color: #f2f3f5;
+  overflow: hidden;
+  user-select: none;
+}
+
+#app {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  height: 100%;
+  background: #111214;
+}
+
+.topbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 6px;
+  padding: 6px 8px;
+  background: #18191c;
+  border-bottom: 1px solid #232428;
+  flex-shrink: 0;
+}
+
+.room-info {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  min-width: 0;
+  flex: 1;
+}
+
+.dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+.dot.offline { background: #6d6f78; }
+.dot.connecting { background: #f0b232; }
+.dot.online { background: #23a55a; }
+
+.code-badge {
+  background: #232428;
+  border: 1px solid #313338;
+  color: #f2f3f5;
+  font-size: 11px;
+  font-weight: 600;
+  padding: 3px 8px;
+  border-radius: 5px;
+  cursor: pointer;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 100%;
+}
+.code-badge:hover {
+  background: #2b2d31;
+}
+
+.top-actions {
+  display: flex;
+  gap: 4px;
+  flex-shrink: 0;
+}
+
+.icon-btn {
+  background: transparent;
+  border: 1px solid transparent;
+  color: #b5bac1;
+  width: 28px;
+  height: 28px;
+  border-radius: 6px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.12s, color 0.12s;
+}
+.icon-btn:hover {
+  background: #2b2d31;
+  color: #f2f3f5;
+}
+.icon-btn.active {
+  background: #f2f3f5;
+  color: #111214;
+}
+
+.status-bar {
+  font-size: 10.5px;
+  color: #949ba4;
+  padding: 4px 10px;
+  background: #141518;
+  border-bottom: 1px solid #1e1f22;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  flex-shrink: 0;
+}
+
+/* Middle stage holds lobby / cams + overlaid mixer drawer */
+.stage {
+  position: relative;
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.lobby {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 8px;
+  padding: 12px;
+}
+
+.lobby input {
+  width: 100%;
+  min-width: 0;
+  background: #1e1f22;
+  border: 1px solid #2b2d31;
+  color: #f2f3f5;
+  padding: 8px 10px;
+  border-radius: 6px;
+  font-size: 12.5px;
+  outline: none;
+}
+.lobby input::placeholder {
+  color: #6d6f78;
+}
+.lobby input:focus {
+  border-color: #80848e;
+}
+
+.lobby-row {
+  display: flex;
+  gap: 6px;
+}
+
+#lobby-code {
+  flex: 1;
+  min-width: 0;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  font-weight: 600;
+}
+
+.btn {
+  border: none;
+  border-radius: 6px;
+  padding: 8px 12px;
+  font-size: 12.5px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.12s;
+}
+.btn.primary {
+  width: 100%;
+  background: #f2f3f5;
+  color: #111214;
+}
+.btn.primary:hover {
+  background: #ffffff;
+}
+.btn.secondary {
+  background: #2b2d31;
+  color: #f2f3f5;
+  flex-shrink: 0;
+}
+.btn.secondary:hover {
+  background: #383a40;
+}
+
+.detect-badge {
+  font-size: 10.5px;
+  text-align: center;
+  color: #6d6f78;
+  margin-top: 2px;
+}
+.detect-badge.found {
+  color: #b5bac1;
+}
+
+/* Dynamic Zoom/Discord-style cam layout — scales cleanly in Pop-up, Side Dock, and Mobile */
+.cams-grid {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 6px;
+  overflow-y: auto;
+}
+
+.cam-tile {
+  position: relative;
+  width: 100%;
+  flex: 1 1 0;
+  min-height: 92px;
+  max-height: 195px;
+  background: #18191c;
+  border-radius: 9px;
+  overflow: hidden;
+  border: 1px solid #2b2d31;
+}
+
+.cam-tile video {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  background: #0d0e10;
+  transform: translateZ(0);
+  backface-visibility: hidden;
+}
+
+/* On wide mobile portrait bottom-dock, arrange cams side-by-side */
+@media (min-width: 340px) {
+  .cams-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    align-content: start;
+  }
+  .cam-tile {
+    flex: none;
+    aspect-ratio: 4 / 3;
+    max-height: 200px;
+  }
+}
+
+.cam-tile.self video {
+  transform: scaleX(-1) translateZ(0);
+}
+
+.cam-label {
+  position: absolute;
+  left: 6px;
+  bottom: 6px;
+  background: rgba(17, 18, 20, 0.82);
+  color: #f2f3f5;
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-size: 10px;
+  font-weight: 600;
+  max-width: calc(100% - 38px);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.peer-mute-btn,
+.cam-hide-btn {
+  background: rgba(17, 18, 20, 0.82);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  color: #f2f3f5;
+  width: 24px;
+  height: 24px;
+  border-radius: 6px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.peer-mute-btn:hover,
+.cam-hide-btn:hover {
+  background: #2b2d31;
+}
+.peer-mute-btn.muted {
+  color: #f23f43;
+}
+
+.cam-tile-actions {
+  position: absolute;
+  right: 6px;
+  bottom: 6px;
+  display: flex;
+  gap: 4px;
+}
+
+/* Phone-friendly View & Camera Settings Dropdown (drops down from gear icon beside Sync) */
+.view-dropdown {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  max-height: 100%;
+  overflow-y: auto;
+  padding: 10px 10px 12px;
+  background: rgba(24, 25, 28, 0.98);
+  border-bottom: 1px solid #313338;
+  box-shadow: 0 10px 28px rgba(0, 0, 0, 0.65);
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  z-index: 20;
+}
+
+.dd-section {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.dd-title {
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.4px;
+  text-transform: uppercase;
+  color: #949ba4;
+}
+
+.dd-cams-list {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.dd-cam-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 6px 8px;
+  background: #1e1f22;
+  border: 1px solid #2b2d31;
+  border-radius: 7px;
+}
+
+.dd-cam-name {
+  font-size: 11.5px;
+  font-weight: 600;
+  color: #f2f3f5;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  min-width: 0;
+}
+
+.dd-cam-sub {
+  font-size: 9.5px;
+  color: #80848e;
+  font-weight: 400;
+  margin-left: 4px;
+}
+
+.dd-cam-toggle {
+  background: #2b2d31;
+  border: 1px solid #383a40;
+  color: #f2f3f5;
+  font-size: 10.5px;
+  font-weight: 600;
+  padding: 4px 9px;
+  border-radius: 5px;
+  cursor: pointer;
+  flex-shrink: 0;
+}
+.dd-cam-toggle:hover {
+  background: #383a40;
+}
+.dd-cam-toggle.is-hidden {
+  background: #f2f3f5;
+  border-color: #f2f3f5;
+  color: #111214;
+}
+
+/* Mixer sheet overlays the bottom of .stage cleanly, never pushing footer away */
+.mixer {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  max-height: 100%;
+  overflow-y: auto;
+  padding: 10px 12px;
+  background: rgba(24, 25, 28, 0.98);
+  border-top: 1px solid #313338;
+  box-shadow: 0 -8px 24px rgba(0, 0, 0, 0.5);
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  z-index: 10;
+}
+
+.slider-group,
+.layout-block {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  width: 100%;
+}
+
+.slider-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 11px;
+  color: #b5bac1;
+}
+.slider-head label {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  font-weight: 500;
+}
+.slider-head span {
+  font-size: 10.5px;
+  color: #949ba4;
+  font-variant-numeric: tabular-nums;
+}
+
+/* Clean custom range slider that never clips on Firefox Desktop or Android */
+input[type="range"] {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 100%;
+  height: 18px;
+  background: transparent;
+  cursor: pointer;
+  margin: 0;
+  padding: 0 2px;
+}
+input[type="range"]::-moz-range-track {
+  height: 4px;
+  border-radius: 99px;
+  background: #313338;
+}
+input[type="range"]::-moz-range-progress {
+  height: 4px;
+  border-radius: 99px;
+  background: #f2f3f5;
+}
+input[type="range"]::-moz-range-thumb {
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background: #f2f3f5;
+  border: 2px solid #18191c;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.5);
+}
+input[type="range"]::-webkit-slider-runnable-track {
+  height: 4px;
+  border-radius: 99px;
+  background: #313338;
+}
+input[type="range"]::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 14px;
+  height: 14px;
+  margin-top: -5px;
+  border-radius: 50%;
+  background: #f2f3f5;
+  border: 2px solid #18191c;
+}
+
+.chip-group {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 5px;
+  width: 100%;
+}
+
+.chip {
+  background: #232428;
+  border: 1px solid #313338;
+  color: #b5bac1;
+  font-size: 11px;
+  font-weight: 600;
+  padding: 6px 4px;
+  border-radius: 6px;
+  cursor: pointer;
+  text-align: center;
+}
+.chip:hover {
+  background: #2b2d31;
+  color: #f2f3f5;
+}
+.chip.active {
+  background: #f2f3f5;
+  border-color: #f2f3f5;
+  color: #111214;
+}
+
+.controls {
+  display: flex;
+  align-items: center;
+  justify-content: space-around;
+  padding: 8px 6px;
+  border-top: 1px solid #232428;
+  background: #18191c;
+  flex-shrink: 0;
+}
+
+.ctrl-btn {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  border: none;
+  background: #2b2d31;
+  color: #f2f3f5;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.12s, color 0.12s;
+}
+.ctrl-btn:hover {
+  background: #383a40;
+}
+.ctrl-btn.off,
+.ctrl-btn.active {
+  background: #f2f3f5;
+  color: #111214;
+}
+.ctrl-btn.danger {
+  background: #da373c;
+  color: #ffffff;
+}
+.ctrl-btn.danger:hover {
+  background: #b82d31;
+}
+
+.hidden {
+  display: none !important;
+}
+
+/* Cam-only Clean Mode (Pop-up): hides all headers, status, controls & labels, shows pure camera feed */
+body.clean-mode .topbar,
+body.clean-mode .status-bar,
+body.clean-mode .controls,
+body.clean-mode .mixer,
+body.clean-mode .view-dropdown,
+body.clean-mode .cam-label,
+body.clean-mode .cam-tile-actions,
+body.clean-mode .peer-mute-btn,
+body.clean-mode .cam-hide-btn {
+  display: none !important;
+}
+body.clean-mode #app {
+  background: #000;
+}
+body.clean-mode .cams-grid {
+  padding: 0 !important;
+  gap: 2px !important;
+  overflow: hidden !important;
+  display: flex !important;
+  flex-direction: column !important;
+}
+body.clean-mode .cam-tile {
+  flex: 1 1 0 !important;
+  min-height: 0 !important;
+  max-height: none !important;
+  border: none !important;
+  border-radius: 0 !important;
+  aspect-ratio: auto !important;
+}
+
+/* Compact layout for mobile landscape fullscreen (dock right/left or pop-up) */
+@media (max-height: 440px) {
+  .topbar {
+    padding: 4px 6px;
+  }
+  .icon-btn {
+    width: 24px;
+    height: 24px;
+  }
+  .status-bar {
+    padding: 2px 8px;
+    font-size: 9.5px;
+  }
+  .cams-grid {
+    gap: 4px;
+    padding: 4px;
+  }
+  .cam-tile {
+    min-height: 64px;
+  }
+  .controls {
+    padding: 5px 4px;
+  }
+  .ctrl-btn {
+    width: 30px;
+    height: 30px;
+  }
+}
