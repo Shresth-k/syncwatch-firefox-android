@@ -1386,7 +1386,7 @@
     }
   }
 
-  function connectWs(url) {
+  function connectWs(url, retryCount = 0) {
     closeWs();
     try {
       ws = new WebSocket(url);
@@ -1394,7 +1394,9 @@
       setStatus(`Invalid server URL: ${url}`, "offline");
       return;
     }
+    let opened = false;
     ws.onopen = () => {
+      opened = true;
       wsConnected = true;
       if (pendingOnOpenAction) {
         sendWs(pendingOnOpenAction);
@@ -1408,10 +1410,16 @@
     };
     ws.onerror = () => {
       wsConnected = false;
+      if (!opened && pendingOnOpenAction && retryCount < 2) {
+        setStatus("Waking server… retrying…", "connecting");
+        setTimeout(() => connectWs(url, retryCount + 1), 3000);
+        return;
+      }
       setStatus(`Cannot reach ${url}`, "offline");
     };
     ws.onclose = () => {
       wsConnected = false;
+      if (!opened) return;
       if (roomCode && peers.size === 0) setStatus("Disconnected — rejoin or create room", "offline");
       else if (roomCode) setStatus("Signaling closed (P2P stays live)", "connecting");
     };
